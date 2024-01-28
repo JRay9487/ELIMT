@@ -20,11 +20,6 @@ app.use(
     })
 );
 
-// 登入介面
-app.get("/login", (req, res) => {
-    res.sendFile(__dirname + "/public/login.html");
-});
-
 // 處理登錄請求
 app.post("/login", (req, res) => {
     const { username, password } = req.body;
