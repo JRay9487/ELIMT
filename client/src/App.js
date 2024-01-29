@@ -1,17 +1,42 @@
-import React from 'react';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import Login from './components/Login';
-import Home from './components/Home';
+import React, { useState, useEffect } from "react";
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import Login from "./components/Login";
+import Home from "./components/Home";
+
+function ProtectedRoute({ children }) {
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+    useEffect(() => {
+        // 檢查用戶是否已經登錄
+        fetch("/checkAuth").then((response) => {
+            if (response.ok) return setIsAuthenticated(true);
+            window.location.href = "/";
+        });
+    }, []);
+
+    if (!isAuthenticated) {
+        return <div>Loading...</div>;
+    }
+
+    return children;
+}
 
 function App() {
-  return (
-    <Router>
-      <Routes>
-        <Route path="/login" element={<Login />} />
-        <Route path="/home" element={<Home />} />
-      </Routes>
-    </Router>
-  );
+    return (
+        <Router>
+            <Routes>
+                <Route path="/" element={<Login />} />
+                <Route
+                    path="/home"
+                    element={
+                        <ProtectedRoute>
+                            <Home />
+                        </ProtectedRoute>
+                    }
+                />
+            </Routes>
+        </Router>
+    );
 }
 
 export default App;
