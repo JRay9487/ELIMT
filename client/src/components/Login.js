@@ -7,12 +7,12 @@ import CssBaseline from "@mui/material/CssBaseline";
 import TextField from "@mui/material/TextField";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Checkbox from "@mui/material/Checkbox";
-import Link from "@mui/material/Link";
 import Box from "@mui/material/Box";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
+import Copyright from "./Home/copyright";
 
 const defaultTheme = createTheme();
 
@@ -108,16 +108,7 @@ function SignIn() {
                         </Button>
                     </Box>
                 </Box>
-                <Link
-                    color="inherit"
-                    href="https://github.com/JRay9487"
-                    align="center"
-                    sx={{ mt: 8, mb: 4 }}
-                >
-                    {"Copyright © "}
-                    CHUN-JUI, LIN {new Date().getFullYear()}
-                    {"."}
-                </Link>
+                <Copyright sx={{ mt: 8, mb: 4 }} />
             </Container>
         </ThemeProvider>
     );

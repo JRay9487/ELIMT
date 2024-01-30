@@ -5,8 +5,12 @@
   "main": "index.js",
   "scripts": {
     "start": "node server.js",
+    "install":"npm install",
     "start-react": "cd client && npm start",
-    "dev": "concurrently \"npm start\" \"npm run start-react\""
+    "install-react":"cd client && npm install",
+    "dev": "concurrently \"npm start\" \"npm run start-react\"",
+    "dev-install":"concurrently \"npm install\" \"npm run install-react\""
+
   },
   "author": "CHUN-JUI,LIN",
   "license": "ISC",
