@@ -33,7 +33,10 @@ const categories = [
     },
     {
         id: "System",
-        children: [{ id: "Account", icon: <SettingsIcon /> }],
+        children: [
+            { id: "Users", icon: <SettingsIcon /> },
+            { id: "Google Drive", icon: <SettingsIcon /> }
+        ],
     },
 ];
 
@@ -56,13 +59,14 @@ const itemCategory = {
 
 //畫面輸出
 export default function Navigator(props) {
-    const { ...other } = props;
+    const { onItemSelect, ...other } = props;
 
     //側邊欄點擊
     const [activeItem, setActiveItem] = React.useState("null");
 
     const handleItemClick = (id) => {
         setActiveItem(id);
+        onItemSelect(id);
     };
 
     return (

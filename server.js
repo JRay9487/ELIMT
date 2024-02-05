@@ -37,13 +37,23 @@ app.post("/login", (req, res) => {
             return;
         }
 
-        // 直接比較密碼
+        // 登入驗證、回傳
         if (password === row.password) {
             req.session.user = username;
+
+            const userJson = {
+                username: row.username,
+                fullname: row.fullname,
+                privilege: row.privilege,
+                email: row.email,
+                picture: row.picture,
+            };
+
             res.json({
                 success: true,
-                message: "Login success",
                 authenticated: true,
+                message: "Login success",
+                user: userJson
             });
         } else {
             res.status(401).json({ error: "Incorrect password" });

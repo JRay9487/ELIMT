@@ -2,9 +2,7 @@ import * as React from "react";
 import PropTypes from "prop-types";
 import AppBar from "@mui/material/AppBar";
 import Avatar from "@mui/material/Avatar";
-import Button from "@mui/material/Button";
 import Grid from "@mui/material/Grid";
-import HelpIcon from "@mui/icons-material/Help";
 import IconButton from "@mui/material/IconButton";
 import Link from "@mui/material/Link";
 import MenuIcon from "@mui/icons-material/Menu";
@@ -18,15 +16,20 @@ import Typography from "@mui/material/Typography";
 const lightColor = "rgba(255, 255, 255, 0.7)";
 
 function Header(props) {
-    const { onDrawerToggle } = props;
+    const { onDrawerToggle, activeItem} = props;
 
     return (
         <React.Fragment>
-            {/* TOP */}
-            <AppBar color="primary" position="sticky" elevation={0}>
+            <AppBar
+                component="div"
+                color="primary"
+                position="static"
+                elevation={0}
+                sx={{ zIndex: 0 }}
+            >
                 <Toolbar>
-                    <Grid container spacing={1} alignItems="center">
-                        <Grid
+                    <Grid container alignItems="center" spacing={1}>
+                    <Grid
                             sx={{ display: { sm: "none", xs: "block" } }}
                             item
                         >
@@ -39,7 +42,15 @@ function Header(props) {
                                 <MenuIcon />
                             </IconButton>
                         </Grid>
-                        <Grid item xs />
+                        <Grid item xs>
+                            <Typography
+                                color="inherit"
+                                variant="h5"
+                                component="h1"
+                            >
+                                {activeItem || 'Profile'}
+                            </Typography>
+                        </Grid>
                         <Grid item>
                             <Link
                                 href="/"
@@ -57,7 +68,7 @@ function Header(props) {
                                 Go to docs
                             </Link>
                         </Grid>
-                        <Grid item>
+                        <Grid item> {/* Alert */}
                             <Tooltip title="Alerts • No alerts">
                                 <IconButton color="inherit">
                                     <NotificationsIcon />
@@ -68,54 +79,16 @@ function Header(props) {
                             <IconButton color="inherit" sx={{ p: 0.5 }}>
                                 <Avatar
                                     src="/static/images/avatar/1.jpg"
-                                    alt="y Avatar"
+                                    alt="My Avatar"
                                 />
                             </IconButton>
                         </Grid>
                     </Grid>
                 </Toolbar>
             </AppBar>
-            {/* Middle */}
-            <AppBar
-                component="div"
-                color="primary"
-                position="static"
-                elevation={0}
-                sx={{ zIndex: 0 }}
-            >
-                <Toolbar>
-                    <Grid container alignItems="center" spacing={1}>
-                        <Grid item xs>
-                            <Typography
-                                color="inherit"
-                                variant="h5"
-                                component="h1"
-                            >
-                                Profile
-                            </Typography>
-                        </Grid>
-                        <Grid item>
-                            <Button
-                                sx={{ borderColor: lightColor }}
-                                variant="outlined"
-                                color="inherit"
-                                size="small"
-                            >
-                                Web setup
-                            </Button>
-                        </Grid>
-                        <Grid item>
-                            <Tooltip title="Help">
-                                <IconButton color="inherit">
-                                    <HelpIcon />
-                                </IconButton>
-                            </Tooltip>
-                        </Grid>
-                    </Grid>
-                </Toolbar>
-            </AppBar>
-            {/* Bottom */}
-            <AppBar
+
+            {/* sec-nav */}
+            <AppBar 
                 component="div"
                 position="static"
                 elevation={0}
@@ -134,6 +107,9 @@ function Header(props) {
 
 Header.propTypes = {
     onDrawerToggle: PropTypes.func.isRequired,
+    activeItem: PropTypes.oneOfType([
+        PropTypes.string
+    ])
 };
 
 export default Header;

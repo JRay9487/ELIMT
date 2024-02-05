@@ -5,20 +5,21 @@
   "main": "index.js",
   "scripts": {
     "start": "node server.js",
-    "install":"npm install",
+    "install-server": "npm install",
     "start-react": "cd client && npm start",
-    "install-react":"cd client && npm install",
+    "install-react": "cd client && npm install",
     "dev": "concurrently \"npm start\" \"npm run start-react\"",
-    "dev-install":"concurrently \"npm install\" \"npm run install-react\""
-
+    "dev-install": "concurrently \"npm run install-server\" \"npm run install-react\""
   },
   "author": "CHUN-JUI,LIN",
   "license": "ISC",
   "dependencies": {
+    "@google-cloud/local-auth": "^2.1.0",
     "bcrypt": "^5.1.1",
     "body-parser": "^1.20.2",
     "express": "^4.18.2",
     "express-session": "^1.17.3",
+    "googleapis": "^105.0.0",
     "nodemon": "^3.0.3",
     "sqlite3": "^5.1.7"
   },

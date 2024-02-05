@@ -16,7 +16,7 @@ import Copyright from "./Home/copyright";
 
 const defaultTheme = createTheme();
 
-function SignIn() {
+export default function SignIn() {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const navigate = useNavigate();
@@ -35,6 +35,7 @@ function SignIn() {
             const data = await response.json();
 
             if (data.success) {
+                localStorage.setItem('user', JSON.stringify(data.user));
                 navigate("/home");
             } else {
                 alert(data.error || "Login failed");
@@ -114,4 +115,3 @@ function SignIn() {
     );
 }
 
-export default SignIn;

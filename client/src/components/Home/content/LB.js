@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
-import { TextField, Button, Typography, Box } from '@mui/material';
+import React, { useState } from "react";
+import { TextField, Button, Typography, Box } from "@mui/material";
+import PdfViewer from "./pdfviewer/pdfviewer";
 
 function Labbook() {
-  const [experimentName, setExperimentName] = useState('');
-  const [experimentDetail, setExperimentDetail] = useState('');
+  const [experimentDetail, setExperimentDetail] = useState("");
   const [selectedFile, setSelectedFile] = useState(null);
 
   const handleFileChange = (event) => {
@@ -13,31 +13,23 @@ function Labbook() {
   const handleSubmit = (event) => {
     event.preventDefault();
     // 在這裡處理表單提交的邏輯
-    console.log(experimentName, experimentDetail, selectedFile);
+    console.log(experimentDetail, selectedFile);
   };
 
   return (
     <Box component="form" onSubmit={handleSubmit}>
       <Typography variant="h6">實驗表單</Typography>
       <TextField
-        label="實驗名稱"
-        value={experimentName}
-        onChange={(e) => setExperimentName(e.target.value)}
-        margin="normal"
-        fullWidth
-      />
-      <TextField
-        label="實驗內容"
+        label="實驗簡述"
         value={experimentDetail}
         onChange={(e) => setExperimentDetail(e.target.value)}
         margin="normal"
         fullWidth
         multiline
       />
-      <input
-        type="file"
-        onChange={handleFileChange}
-      />
+      <input type="file" onChange={handleFileChange} />
+      {selectedFile && <PdfViewer pdffile={selectedFile} />}{" "}
+      {/* 使用PdfViewer組件來預覽選擇的文件 */}
       <Button
         type="submit"
         variant="contained"
@@ -48,6 +40,6 @@ function Labbook() {
       </Button>
     </Box>
   );
-};
+}
 
 export default Labbook;
