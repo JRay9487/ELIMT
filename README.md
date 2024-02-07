@@ -8,11 +8,12 @@
 
 ## 架構 
   由Express結合React 形成簡易免安裝網頁介面，透過Sqlite儲存基本用戶資訊，並利用Drive API 上傳實驗記錄至雲端硬碟。
-  
+  ![project](https://github.com/JRay9487/Electrical-laboratory-Notebook/assets/65828051/987ebe11-90a0-4d03-b816-3cd93b66f3bd)
+
   利用MUI(Material UI) 介面減低開發難度，並可自行更改喜歡的顯示風格。
 
   為開發方便使用，目前前後端及資料庫之間的連線是未加密的，建議僅在校園內網內使用。
-  ![project](https://github.com/JRay9487/Electrical-laboratory-Notebook/assets/65828051/8fdbd307-62cd-4dfe-a1a8-85fbcb6cb694)
+  
 
 
 ## 功能
