@@ -12,7 +12,8 @@
   利用MUI(Material UI) 介面減低開發難度，並可自行更改喜歡的顯示風格。
 
   為開發方便使用，目前前後端及資料庫之間的連線是未加密的，建議僅在校園內網內使用。
-  ![project](https://github.com/JRay9487/Electrical-laboratory-Notebook/assets/65828051/e50fe61b-0503-4469-81d2-d6a648151879)
+  ![project](https://github.com/JRay9487/Electrical-laboratory-Notebook/assets/65828051/8fdbd307-62cd-4dfe-a1a8-85fbcb6cb694)
+
 
 ## 功能
   大部分功能尚在開發中，目前先以完成電子實驗紀錄簿為主要開發方向。
