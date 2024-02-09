@@ -1,9 +1,10 @@
 import React from "react";
+import { Typography } from "@mui/material";
 
-export default function links () {
+export default function links() {
     return (
-        <div>
-            <h1>links</h1>
-        </div>
-    )
+        <Typography variant="h5" fontWeight="bold" margin={2}>
+            Links
+        </Typography>
+    );
 }

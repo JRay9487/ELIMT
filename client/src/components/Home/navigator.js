@@ -1,15 +1,21 @@
-import * as React from "react";
-import Divider from "@mui/material/Divider";
-import Drawer from "@mui/material/Drawer";
-import List from "@mui/material/List";
-import Box from "@mui/material/Box";
-import ListItem from "@mui/material/ListItem";
-import ListItemButton from "@mui/material/ListItemButton";
-import ListItemIcon from "@mui/material/ListItemIcon";
-import ListItemText from "@mui/material/ListItemText";
-import PeopleIcon from "@mui/icons-material/People";
+import React, { useState, useEffect } from "react";
+import {
+    Typography,
+    Divider,
+    Drawer,
+    List,
+    Box,
+    ListItem,
+    ListItemButton,
+    ListItemIcon,
+    ListItemText,
+} from "@mui/material";
 import PublicIcon from "@mui/icons-material/Public";
+import PeopleIcon from "@mui/icons-material/People";
+import AccountBoxIcon from "@mui/icons-material/AccountBox";
+import CheckBoxIcon from "@mui/icons-material/CheckBox";
 import SettingsIcon from "@mui/icons-material/Settings";
+import BookIcon from "@mui/icons-material/Book";
 
 //側邊欄項目
 const categories = [
@@ -18,25 +24,30 @@ const categories = [
         children: [
             {
                 id: "Profile",
-                icon: <PeopleIcon />,
+                icon: <AccountBoxIcon />,
+                privilegeLevel: 1,
             },
             {
                 id: "Lab Book",
-                icon: <PeopleIcon />,
+                icon: <BookIcon />,
+                privilegeLevel: 1,
             },
             {
                 id: "Lab Book Approval",
-                icon: <PeopleIcon />,
+                icon: <CheckBoxIcon />,
+                privilegeLevel: 2,
             },
-            { id: "Links", icon: <PublicIcon /> },
+            { id: "Links", icon: <PublicIcon />, privilegeLevel: 1 },
         ],
+        privilegeLevel: 1,
     },
     {
         id: "System",
         children: [
-            { id: "Users", icon: <SettingsIcon /> },
-            { id: "Google Drive", icon: <SettingsIcon /> }
+            { id: "Users", icon: <PeopleIcon />, privilegeLevel: 2 },
+            { id: "Settings", icon: <SettingsIcon />, privilegeLevel: 3 },
         ],
+        privilegeLevel: 2,
     },
 ];
 
@@ -60,9 +71,19 @@ const itemCategory = {
 //畫面輸出
 export default function Navigator(props) {
     const { onItemSelect, ...other } = props;
+    const [userInfo, setUserInfo] = useState({ privilege: 0 });
+    const [activeItem, setActiveItem] = useState("null");
+
+    useEffect(() => {
+        //get userInfo from local storage
+        const userInfoString = localStorage.getItem("user");
+        if (userInfoString) {
+            const userInfo = JSON.parse(userInfoString);
+            setUserInfo(userInfo);
+        }
+    }, []);
 
     //側邊欄點擊
-    const [activeItem, setActiveItem] = React.useState("null");
 
     const handleItemClick = (id) => {
         setActiveItem(id);
@@ -80,30 +101,56 @@ export default function Navigator(props) {
                         color: "#fff",
                     }}
                 >
-                    YLK LAB
+                    YLK ELIMT
+                    <Typography
+                        sx={{
+                            fontSize: 10,
+                            ml: 0.5,
+                            mt: 0.9,
+                            color: "#fff",
+                        }}
+                    >
+                        Beta 1.0
+                    </Typography>
                 </ListItem>
-                {categories.map(({ id, children }) => (
-                    <Box key={id} sx={{ bgcolor: "#101F34" }}>
-                        <ListItem sx={{ py: 2, px: 3 }}>
-                            <ListItemText sx={{ color: "#fff" }}>
-                                {id}
-                            </ListItemText>
-                        </ListItem>
-                        {children.map(({ id: childId, icon, active }) => (
-                            <ListItem disablePadding key={childId}>
-                                <ListItemButton
-                                    selected={activeItem === childId}
-                                    onClick={() => handleItemClick(childId)}
-                                    sx={item}
-                                >
-                                    <ListItemIcon>{icon}</ListItemIcon>
-                                    <ListItemText>{childId}</ListItemText>
-                                </ListItemButton>
+
+                {categories
+                    .filter(
+                        (category) =>
+                            userInfo.privilege >= category.privilegeLevel
+                    ) // 過濾類別級別
+                    .map(({ id, children, privilegeLevel }) => (
+                        <Box key={id} sx={{ bgcolor: "#101F34" }}>
+                            <ListItem sx={{ py: 2, px: 3 }}>
+                                <ListItemText sx={{ color: "#fff" }}>
+                                    {id}
+                                </ListItemText>
                             </ListItem>
-                        ))}
-                        <Divider sx={{ mt: 2 }} />
-                    </Box>
-                ))}
+                            {children
+                                .filter(
+                                    (child) =>
+                                        userInfo.privilege >=
+                                        child.privilegeLevel
+                                ) // 過濾子項目級別
+                                .map(({ id: childId, icon }) => (
+                                    <ListItem disablePadding key={childId}>
+                                        <ListItemButton
+                                            selected={activeItem === childId}
+                                            onClick={() =>
+                                                handleItemClick(childId)
+                                            }
+                                            sx={item}
+                                        >
+                                            <ListItemIcon>{icon}</ListItemIcon>
+                                            <ListItemText>
+                                                {childId}
+                                            </ListItemText>
+                                        </ListItemButton>
+                                    </ListItem>
+                                ))}
+                            <Divider sx={{ mt: 2 }} />
+                        </Box>
+                    ))}
             </List>
         </Drawer>
     );

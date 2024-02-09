@@ -10,6 +10,8 @@ import Content from "./Home/content";
 import Header from "./Home/header";
 import Copyright from "./Home/copyright";
 
+const drawerWidth = 256;
+
 //創建主題
 let theme = createTheme({
     palette: {
@@ -17,6 +19,11 @@ let theme = createTheme({
             light: "#63ccff",
             main: "#009be5",
             dark: "#006db3",
+        },
+        night: {
+            light: "#2c2c2c",
+            main: "#1a1a1a",
+            dark: "#0c0c0c",
         },
     },
     typography: {
@@ -155,8 +162,6 @@ theme = {
     },
 };
 
-const drawerWidth = 256;
-
 //輸出畫面
 export default function Home() {
     const [mobileOpen, setMobileOpen] = React.useState(false);
@@ -165,7 +170,7 @@ export default function Home() {
 
     const handleActiveItemChange = (item) => {
         setActiveItem(item);
-  };
+    };
 
     const handleDrawerToggle = () => {
         setMobileOpen(!mobileOpen);
@@ -200,15 +205,13 @@ export default function Home() {
                 <Box sx={{ flex: 1, display: "flex", flexDirection: "column" }}>
                     <Header
                         onDrawerToggle={handleDrawerToggle}
-                        activeItem={activeItem} 
+                        activeItem={activeItem}
                     />
                     <Box
                         component="main"
                         sx={{ flex: 1, py: 6, px: 4, bgcolor: "#eaeff1" }}
                     >
-                        <Content 
-                            activeItem={activeItem}
-                        />
+                        <Content activeItem={activeItem} />
                     </Box>
                     <Box component="footer" sx={{ p: 2, bgcolor: "#eaeff1" }}>
                         <Copyright />

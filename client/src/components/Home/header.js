@@ -1,22 +1,61 @@
-import * as React from "react";
+import React, { useState } from "react";
 import PropTypes from "prop-types";
-import AppBar from "@mui/material/AppBar";
-import Avatar from "@mui/material/Avatar";
-import Grid from "@mui/material/Grid";
-import IconButton from "@mui/material/IconButton";
-import Link from "@mui/material/Link";
+import {
+    AppBar,
+    Avatar,
+    Grid,
+    IconButton,
+    Link,
+    Tab,
+    Tabs,
+    Toolbar,
+    Tooltip,
+    Typography,
+    Dialog,
+    DialogTitle,
+    DialogContent,
+    DialogContentText,
+    DialogActions,
+    Button,
+} from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import NotificationsIcon from "@mui/icons-material/Notifications";
-import Tab from "@mui/material/Tab";
-import Tabs from "@mui/material/Tabs";
-import Toolbar from "@mui/material/Toolbar";
-import Tooltip from "@mui/material/Tooltip";
-import Typography from "@mui/material/Typography";
 
 const lightColor = "rgba(255, 255, 255, 0.7)";
 
+//tabs
+const tabMap = {
+    Profile: ["Welcome", "Account"],
+    "Lab Book": ["Assignment", "History"],
+    "Lab Book Approval": ["Approval", "History"],
+    Links: ["Links"],
+    Settings: ["Settings"],
+    Users: ["Users"],
+};
+
 function Header(props) {
-    const { onDrawerToggle, activeItem} = props;
+    const { onDrawerToggle, activeItem } = props;
+
+    const currentTabs = tabMap[activeItem] || tabMap["Profile"];
+    const [openDialog, setOpenDialog] = useState(false);
+    const [clickCount, setClickCount] = useState(0);
+    const [rotation, setRotation] = React.useState(0); // 旋轉角度的初始值為0
+
+    // click counter
+    const handleIconClick = () => {
+        setClickCount((prevCount) => prevCount + 1);
+        if (clickCount >= 9) {
+            setOpenDialog(true);
+        }
+        setRotation((prevRotation) => prevRotation + 12); // 每次點擊增加12度
+    };
+
+    // popup
+    const handleCloseDialog = () => {
+        setOpenDialog(false);
+        setClickCount(0);
+        setRotation(0);
+    };
 
     return (
         <React.Fragment>
@@ -28,8 +67,13 @@ function Header(props) {
                 sx={{ zIndex: 0 }}
             >
                 <Toolbar>
-                    <Grid container alignItems="center" spacing={1}>
                     <Grid
+                        container
+                        alignItems="center"
+                        spacing={1}
+                        marginTop={0.5}
+                    >
+                        <Grid
                             sx={{ display: { sm: "none", xs: "block" } }}
                             item
                         >
@@ -48,12 +92,12 @@ function Header(props) {
                                 variant="h5"
                                 component="h1"
                             >
-                                {activeItem || 'Profile'}
+                                {activeItem || "Profile"}
                             </Typography>
                         </Grid>
                         <Grid item>
                             <Link
-                                href="/"
+                                href="https://github.com/JRay9487/Electrical-laboratory-Notebook/blob/main/README.md"
                                 variant="body2"
                                 sx={{
                                     textDecoration: "none",
@@ -68,7 +112,9 @@ function Header(props) {
                                 Go to docs
                             </Link>
                         </Grid>
-                        <Grid item> {/* Alert */}
+                        <Grid item>
+                            {" "}
+                            {/* Alert */}
                             <Tooltip title="Alerts • No alerts">
                                 <IconButton color="inherit">
                                     <NotificationsIcon />
@@ -76,10 +122,15 @@ function Header(props) {
                             </Tooltip>
                         </Grid>
                         <Grid item>
-                            <IconButton color="inherit" sx={{ p: 0.5 }}>
+                            <IconButton
+                                color="inherit"
+                                onClick={handleIconClick}
+                                sx={{ p: 0.5 }}
+                            >
                                 <Avatar
-                                    src="/static/images/avatar/1.jpg"
-                                    alt="My Avatar"
+                                    src="flask.webp"
+                                    alt="Web Avatar"
+                                    sx={{ transform: `rotate(${rotation}deg)` }}
                                 />
                             </IconButton>
                         </Grid>
@@ -88,28 +139,50 @@ function Header(props) {
             </AppBar>
 
             {/* sec-nav */}
-            <AppBar 
+            <AppBar
                 component="div"
                 position="static"
                 elevation={0}
                 sx={{ zIndex: 0 }}
             >
                 <Tabs value={0} textColor="inherit">
-                    <Tab label="Users" />
-                    <Tab label="Sign-in method" />
-                    <Tab label="Templates" />
-                    <Tab label="Usage" />
+                    {currentTabs.map((label, index) => (
+                        <Tab
+                            key={index}
+                            label={label}
+                            sx={{
+                                "&:hover": {
+                                    bgcolor: "transparent",
+                                    color: "inherit",
+                                },
+                            }}
+                        />
+                    ))}
                 </Tabs>
             </AppBar>
+            <Dialog open={openDialog} onClose={handleCloseDialog}>
+                <DialogTitle>{"恭喜你把實驗室炸了！"}</DialogTitle>
+                <DialogContent>
+                    <DialogContentText>
+                        老師在你背後，現在很火
+                    </DialogContentText>
+                    <DialogContentText sx={{ fontSize: 14 }}>
+                        就說別亂玩化學品吧
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleCloseDialog} color="primary">
+                        好的
+                    </Button>
+                </DialogActions>
+            </Dialog>
         </React.Fragment>
     );
 }
 
 Header.propTypes = {
     onDrawerToggle: PropTypes.func.isRequired,
-    activeItem: PropTypes.oneOfType([
-        PropTypes.string
-    ])
+    activeItem: PropTypes.oneOfType([PropTypes.string]),
 };
 
 export default Header;

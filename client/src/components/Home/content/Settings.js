@@ -1,12 +1,10 @@
 import React from "react";
 import { Typography } from "@mui/material";
 
-export default function Profile({ userInfo }) {
-    const username = userInfo ? userInfo.username : "Unknown";
-
+export default function Settings() {
     return (
         <Typography variant="h5" fontWeight="bold" margin={2}>
-            你好， {username}
+            Settings
         </Typography>
     );
 }
