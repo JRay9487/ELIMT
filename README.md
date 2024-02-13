@@ -40,6 +40,11 @@
 ## 下載
   ### 注意事項
   * 本專案在Node.js v18.16.0下開發，其他版本相容性目前尚不知。
+  * 第一次使用必須在運行電腦上進行Google 雲端授權驗證。
+
+  ### 已知Bug
+  * 在MacOS Sonoma 14.2.1, Safari 17.2.1（19617.1.17.11.12）下， ```@google-cloud/local-auth```可能無法進行本地驗證，建議使用Chrome瀏覽器。
+
 
   ### 安裝方法
   1. 下載[Node.js v18.16.0](https://nodejs.org/en)
