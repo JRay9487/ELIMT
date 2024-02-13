@@ -47,7 +47,7 @@ export default function PdfViewer({ onFileSelect }) {
         <Paper className="paper">
             <Grid
                 {...getRootProps({ className: "dropzone" })}
-                sx={{ width: "100%" }}
+                sx={{ width: "100%", padding:1 }}
             >
                 <input {...getInputProps()} />
                 <Typography sx={{ fontWeight: "bold", textAlign: "center" }}>
@@ -76,9 +76,9 @@ export default function PdfViewer({ onFileSelect }) {
                 >
                     {"<"}
                 </Button>
-                <p className="pdfnav-text">
-                    {pageNumber || (numPages ? 1 : "--")} / {numPages || "--"}
-                </p>
+                <Typography>
+                {pageNumber || (numPages ? 1 : "--")} / {numPages || "--"}
+                </Typography>
                 <Button
                     type="button"
                     disabled={pageNumber >= numPages}

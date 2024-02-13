@@ -3,6 +3,9 @@ const sqlite3 = require("sqlite3");
 const bodyParser = require("body-parser");
 const multer = require("multer");
 const session = require("express-session");
+const fs = require("fs");
+const nodemailer = require('nodemailer');
+const uploadsFolder = "./uploads/";
 const settings = require("./settings.json");
 
 //GoogleDrive 組件
@@ -14,68 +17,80 @@ const { checkedFile } = require("./functions/checked");
 //設定
 const app = express();
 const db = new sqlite3.Database("mydb.sqlite"); //database connect
-const port = settings.server_port; //port
 const upload = multer({ dest: "uploads/" }); // 暫存檔位置
+const port = 3001; 
+const mailerinterval = settings.SystemMailInterval * 3600000 ; 
+
 
 // 解析POST請求
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json()); // 添加 JSON 解析
 
 app.use(
-    session({
-        secret: "my-secret-key",
-        resave: false,
-        saveUninitialized: true,
-    })
+  session({
+    secret: "my-secret-key",
+    resave: false,
+    saveUninitialized: true,
+  })
 );
 
 // 處理登錄請求
 app.post("/login", (req, res) => {
-    const { username, password } = req.body;
-    // 在數據庫中查找用戶信息
-    db.get("SELECT * FROM users WHERE username = ?", [username], (err, row) => {
-        if (err) {
-            console.error(err.message);
-            res.status(500).json({ error: "Internal server error" });
-            return;
-        }
+  const { username, password } = req.body;
+  db.get("SELECT * FROM users WHERE username = ?", [username], (err, row) => {
+    if (err) {
+      console.error(err.message);
+      res.status(500).json({ error: "Internal server error" });
+      return;
+    }
 
-        if (!row) {
-            res.status(401).json({ error: "Username not found" });
-            return;
-        }
+    if (!row) {
+      res.status(401).json({ error: "Username not found" });
+      return;
+    }
 
-        // 登入驗證、回傳
-        if (password === row.password) {
-            req.session.user = username;
+    // 登入驗證、回傳
+    if (password === row.password) {
+      req.session.user = username;
 
-            const userJson = {
-                username: row.username,
-                fullname: row.fullname,
-                privilege: row.privilege,
-                email: row.email,
-                picture: row.picture,
-            };
+      const userJson = {
+        username: row.username,
+        fullname: row.fullname,
+        privilege: row.privilege,
+        email: row.email,
+      };
 
-            res.json({
-                success: true,
-                authenticated: true,
-                message: "Login success",
-                user: userJson,
-            });
-        } else {
-            res.status(401).json({ error: "Incorrect password" });
-        }
-    });
+      res.json({
+        success: true,
+        authenticated: true,
+        message: "Login success",
+        user: userJson,
+      });
+    } else {
+      res.status(401).json({ error: "Incorrect password" });
+    }
+  });
 });
 
 // 登入認證
 app.get("/checkAuth", (req, res) => {
-    if (req.session.user) {
-        res.status(200).send("Authenticated");
-    } else {
-        res.status(401).send("Unauthorized");
-    }
+  if (req.session.user) {
+    res.status(200).send("Authenticated");
+  } else {
+    res.status(401).send("Unauthorized");
+  }
+});
+
+// Oauth
+app.get("/api/oauth", (req, res) => {
+  authorize()
+    .then((auth) => {
+      res.redirect("/");
+    })
+    .catch((error) => {
+      console.error("Authorization failed:", error);
+      res.status(500).send("Failed to authorize.");
+    });
 });
 
 // 檔案上傳雲端
@@ -128,96 +143,213 @@ app.post("/api/upload", upload.single("file"), (req, res) => {
 
 // 獲得雲端檔案列表
 app.get("/api/list", (req, res) => {
-    const folderId = settings.GDrive_folderID;
+  const folderId = settings.GDrive_folderID;
 
-    authorize().then((auth) => {
-        listFiles(auth, folderId)
-            .then((files) => {
-                res.send({ success: true, files: files });
-            })
-            .catch((error) => {
-                console.error(error);
-                res.status(500).send("Failed to list files from Google Drive.");
-            });
-    });
+  authorize().then((auth) => {
+    listFiles(auth, folderId)
+      .then((files) => {
+        res.send({ success: true, files: files });
+      })
+      .catch((error) => {
+        console.error(error);
+        res.status(500).send("Failed to list files from Google Drive.");
+      });
+  });
 });
 
 // SQLite API接口
 app.get("/api/files", (req, res) => {
-    const { creater, check } = req.query;
+  const { creater, check } = req.query;
 
-    // 構建 SQL 查詢的基本部分
-    let query = 'SELECT "googleId", "filename", "creater", "date" FROM files';
-    const params = [];
+  // 構建 SQL 查詢的基本部分
+  let query = 'SELECT "googleId", "filename", "creater", "date" FROM files';
+  const params = [];
 
-    // 構建 SQL 查詢的條件部分
-    if (creater || check) {
-        let conditions = [];
+  // 構建 SQL 查詢的條件部分
+  if (creater || check) {
+    let conditions = [];
 
-        if (creater) {
-            conditions.push('"creater" = ?');
-            params.push(creater);
-        }
-
-        if (check) {
-            conditions.push('"check" = ?');
-            params.push(check === "true" ? "true" : "false"); // 確保只將 'true' 或 'false' 作為參數
-        }
-
-        query += " WHERE " + conditions.join(" AND ");
+    if (creater) {
+      conditions.push('"creater" = ?');
+      params.push(creater);
     }
 
-    // 執行查詢
-    db.all(query, params, (err, rows) => {
-        if (err) {
-            res.status(500).json({ error: err.message });
-            return;
-        }
-        res.json({ success: true, files: rows });
-    });
+    if (check) {
+      conditions.push('"check" = ?');
+      params.push(check === "true" ? "true" : "false"); // 確保只將 'true' 或 'false' 作為參數
+    }
+
+    query += " WHERE " + conditions.join(" AND ");
+  }
+
+  // 執行查詢
+  db.all(query, params, (err, rows) => {
+    if (err) {
+      res.status(500).json({ error: err.message });
+      return;
+    }
+    res.json({ success: true, files: rows });
+  });
 });
 
 // 檔案簽核
 app.post("/api/checked", async (req, res) => {
-    const { googleIds } = req.body;
+  const { googleIds } = req.body;
 
-    authorize()
-        .then((auth) => {
-            Promise.all(googleIds.map((fileId) => checkedFile(auth, fileId)))
-                .then(() => listFiles(auth, settings.GDrive_folderID)) // 更新本地列表
-                .then(() => {
-                    const query =
-                        'SELECT "googleId", "filename", "creater", "date" FROM files WHERE "check" = "false"';
-                    db.all(query, [], (err, rows) => {
-                        if (err) {
-                            console.error("從數據庫獲取文件時出錯：", err);
-                            return res.status(500).json({
-                                success: false,
-                                message: "從數據庫獲取文件時出錯",
-                            });
-                        }
-                        // 返回更新後的文件列表
-                        res.json({
-                            success: true,
-                            files: rows,
-                        });
-                    });
-                })
-                .catch((error) => {
-                    console.error("處理文件或更新列表時出錯：", error);
-                    res.status(500).json({
-                        success: false,
-                        message: "處理文件或更新列表時出錯",
-                    });
-                });
+  authorize()
+    .then((auth) => {
+      Promise.all(googleIds.map((fileId) => checkedFile(auth, fileId)))
+        .then(() => listFiles(auth, settings.GDrive_folderID)) // 更新本地列表
+        .then(() => {
+          const query =
+            'SELECT "googleId", "filename", "creater", "date" FROM files WHERE "check" = "false"';
+          db.all(query, [], (err, rows) => {
+            if (err) {
+              console.error("從數據庫獲取文件時出錯：", err);
+              return res.status(500).json({
+                success: false,
+                message: "從數據庫獲取文件時出錯",
+              });
+            }
+            // 返回更新後的文件列表
+            res.json({
+              success: true,
+              files: rows,
+            });
+          });
         })
-        .catch((authError) => {
-            console.error("授權失敗：", authError);
-            res.status(500).json({ success: false, message: "授權失敗" });
+        .catch((error) => {
+          console.error("處理文件或更新列表時出錯：", error);
+          res.status(500).json({
+            success: false,
+            message: "處理文件或更新列表時出錯",
+          });
         });
+    })
+    .catch((authError) => {
+      console.error("授權失敗：", authError);
+      res.status(500).json({ success: false, message: "授權失敗" });
+    });
 });
+
+// 刷新待簽核項目
+app.get("/api/refresh", (req, res) => {
+  const folderId = settings.GDrive_folderID;
+
+  authorize().then((auth) => {
+    listFiles(auth, folderId)
+      .then(() => {
+        const query =
+          'SELECT "googleId"  FROM files WHERE "check" = "false"';
+        db.all(query, [], (err, rows) => {
+          if (err) {
+            console.error("Error when fetching file from database:", err);
+            return res.status(500).json({
+              success: false,
+              message: "Error when fetching file from database",
+            });
+          }
+          // 返回更新後的文件列表
+          res.json({
+            success: true,
+            files: rows,
+          });
+        });
+      })
+      .catch((error) => {
+        console.error("Error processing file or updating list:", error);
+        res.status(500).json({
+          success: false,
+          message: "Error processing file or updating list.",
+        });
+      });
+  });
+});
+
+// 郵件提醒
+function sendMail(callback) {
+    var transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: settings.SystemMailer,
+        pass: settings.SystemMailerPass
+      }
+    });
+    
+    const query = 'SELECT "email" FROM users WHERE "privilege" > 2';
+    db.all(query, [], (err, rows) => {
+      if (err) {
+        throw err;
+      }
+  
+      const receivers = rows.map(row => row.email).join(', ');
+  
+      if (receivers) {
+        var mailOptions = {
+          from: settings.SystemMailer,
+          to: receivers, // 使用轉換後的接收者字串
+          subject: 'ELIMT System Information',
+          html: "<h3>您有一份待簽核文件，請撥空查閱ELIMT電子系統。</h3><h3>You have a document to be signed, please check the ELIMT system.</h3>"
+        };
+  
+        transporter.sendMail(mailOptions, callback);
+      } else {
+        console.log("No users with privilege > 1 found.");
+      }
+    });
+  }
+  
+  // 週期性更新
+  setInterval(() => {
+    const query = 'SELECT "googleId" FROM files WHERE "check" = "false"';
+    db.all(query, [], (err, rows) => {
+      if (err) {
+        throw err;
+      }
+      if (rows.length > 0) {
+        // 如果有一或多個文件未檢查，則發送郵件
+        sendMail((error, info) => {
+          if (error) {
+            console.log('Error sending mail: ', error);
+          } else {
+            console.log('Mail sent: ', info.response);
+          }
+        });
+      }
+    });
+  }, mailerinterval);
+
+// 暫存檔案清除器
+setInterval(() => {
+  fs.readdir(uploadsFolder, (err, files) => {
+    if (err) {
+      console.error("Failed to read uploads folder:", err);
+      return;
+    }
+
+    if (files.length > 5) {
+      let oldestFile = files[0];
+      let oldestFileDate = fs.statSync(uploadsFolder + oldestFile).ctime;
+      for (let i = 1; i < files.length; i++) {
+        const fileDate = fs.statSync(uploadsFolder + files[i]).ctime;
+        if (fileDate < oldestFileDate) {
+          oldestFile = files[i];
+          oldestFileDate = fileDate;
+        }
+      }
+
+      fs.unlink(uploadsFolder + oldestFile, (err) => {
+        if (err) {
+          console.error("Failed to delete file:", err);
+          return;
+        }
+        console.log("File deleted successfully:", oldestFile);
+      });
+    }
+  });
+}, 600000); //10 mins
 
 // 啟動服務器
 app.listen(port, () => {
-    console.log(`Server is running on http://localhost:${port}`);
+  console.log(`Server is running on http://localhost:${port}`);
 });

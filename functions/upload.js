@@ -23,7 +23,7 @@ async function uploadFile(auth, folderId, fileName, filePath) {
         return file.data.id; // 回傳檔案 ID
     } catch (error) {
         console.error("The API returned an error: " + error);
-        throw error; // 向上拋出異常
+        throw error; 
     }
 }
 

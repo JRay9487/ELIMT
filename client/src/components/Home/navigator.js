@@ -17,7 +17,7 @@ import CheckBoxIcon from "@mui/icons-material/CheckBox";
 import SettingsIcon from "@mui/icons-material/Settings";
 import BookIcon from "@mui/icons-material/Book";
 
-//側邊欄項目
+// 側邊欄項目
 const categories = [
     {
         id: "Functions",
@@ -51,7 +51,7 @@ const categories = [
     },
 ];
 
-//側邊欄項目大小
+// 項目大小
 const item = {
     py: "2px",
     px: 3,
@@ -61,14 +61,14 @@ const item = {
     },
 };
 
-//側邊欄項目分類大小
+// 項目分類大小
 const itemCategory = {
     boxShadow: "0 -1px 0 rgb(255,255,255,0.1) inset",
     py: 1.5,
     px: 3,
 };
 
-//畫面輸出
+// 畫面輸出
 export default function Navigator(props) {
     const { onItemSelect, ...other } = props;
     const [userInfo, setUserInfo] = useState({ privilege: 0 });
@@ -91,8 +91,8 @@ export default function Navigator(props) {
     };
 
     return (
-        <Drawer variant="permanent" {...other}>
-            <List disablePadding>
+        <Drawer variant="permanent" {...other} >
+            <List disablePadding sx={{bgcolor:"#141414"}}>
                 <ListItem
                     sx={{
                         ...item,
@@ -120,9 +120,9 @@ export default function Navigator(props) {
                             userInfo.privilege >= category.privilegeLevel
                     ) // 過濾類別級別
                     .map(({ id, children, privilegeLevel }) => (
-                        <Box key={id} sx={{ bgcolor: "#101F34" }}>
-                            <ListItem sx={{ py: 2, px: 3 }}>
-                                <ListItemText sx={{ color: "#fff" }}>
+                        <Box key={id} sx={{ bgcolor:"#1C1C1C" }}>
+                            <ListItem sx={{ py: 1, px: 3 ,bgcolor:"#1C1C1C"}}>
+                                <ListItemText sx={{color: "#fff" }}>
                                     {id}
                                 </ListItemText>
                             </ListItem>

@@ -10,7 +10,7 @@ import Users from "./content/Users";
 import Settings from "./content/Settings";
 
 export default function Content(props) {
-    const { activeItem } = props;
+    const { activeItem, tabIndex } = props;
 
     //get userInfo from local storage
     const [userInfo, setUserInfo] = useState({});
@@ -23,27 +23,29 @@ export default function Content(props) {
         }
     }, []);
 
+    // tabindex
+
     const renderContentComponent = () => {
         switch (activeItem) {
             case "Profile":
-                return <Profile userInfo={userInfo} />;
+                return <Profile userInfo={userInfo} tabIndex={tabIndex} />;
             case "Lab Book":
-                return <Labbook userInfo={userInfo} />;
+                return <Labbook userInfo={userInfo} tabIndex={tabIndex} />;
             case "Lab Book Approval":
-                return <LBapprove />;
+                return <LBapprove tabIndex={tabIndex}/>;
             case "Links":
-                return <Links />;
+                return <Links tabIndex={tabIndex}/>;
             case "Settings":
-                return <Settings />;
+                return <Settings tabIndex={tabIndex}/>;
             case "Users":
-                return <Users />;
+                return <Users tabIndex={tabIndex}/>;
             default:
-                return <Profile userInfo={userInfo} />;
+                return <Profile userInfo={userInfo} tabIndex={tabIndex}/>;
         }
     };
 
     return (
-        <Paper sx={{ maxWidth: 936, margin: "auto", overflow: "hidden" }}>
+        <Paper sx={{ maxWidth: 936, margin: "auto", overflow: "hidden",}}>
             {renderContentComponent()}
         </Paper>
     );

@@ -9,6 +9,7 @@ import {
     Paper,
     Checkbox,
     Typography,
+    Link,
 } from "@mui/material";
 
 function CheckableList({ items, checked, onToggle }) {
@@ -21,7 +22,7 @@ function CheckableList({ items, checked, onToggle }) {
                 margin={2}
                 textAlign={"center"}
             >
-                目前無檔案待簽核
+                目前無待簽核文件
             </Typography>
         );
     }
@@ -30,7 +31,7 @@ function CheckableList({ items, checked, onToggle }) {
         <TableContainer component={Paper}>
             <Table aria-label="checkable table">
                 <TableHead>
-                    <TableRow>
+                    <TableRow sx={{}}>
                         <TableCell padding="checkbox"></TableCell>
                         <TableCell>Creater</TableCell>
                         <TableCell>Filename</TableCell>
@@ -59,13 +60,13 @@ function CheckableList({ items, checked, onToggle }) {
                                 {item.creater}
                             </TableCell>
                             <TableCell>
-                                <a
+                                <Link
                                     href={`https://drive.google.com/file/d/${item.googleId}/view?usp=drive_link`}
                                     target="_blank"
                                     rel="noopener noreferrer"
                                 >
                                     {item.filename}
-                                </a>
+                                </Link>
                             </TableCell>
                             <TableCell>{item.date}</TableCell>
                         </TableRow>
