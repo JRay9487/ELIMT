@@ -1,7 +1,7 @@
 <div align=center>
   <img width =256 src="https://github.com/JRay9487/Electrical-laboratory-Notebook/assets/65828051/d791f893-5773-4dd9-b2ad-94e0f721e5b8"/>
   <h3>ELIMT</h3>
-  <p>開源、簡單，適合各大專院校實驗室使用的電子系統</p>
+  <p>簡單，適合各大專院校實驗室使用的電子系統</p>
 </div>
 
 

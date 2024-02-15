@@ -9,7 +9,6 @@ import {
   Tab,
   Tabs,
   Toolbar,
-  Tooltip,
   Typography,
   Dialog,
   DialogTitle,
@@ -19,15 +18,14 @@ import {
   Button,
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
-import NotificationsIcon from "@mui/icons-material/Notifications";
 
 const lightColor = "rgba(255, 255, 255, 0.7)";
 
 //tabs
 const tabMap = {
   Profile: ["Welcome", "Account"],
-  "Lab Book": ["Assignment", "History"],
-  "Lab Book Approval": ["Approval", "History"],
+  "LabBook": ["Assignment", "History"],
+  "LabBook Approval": ["Approval", "History"],
   Links: ["Website"],
   Settings: ["Settings"],
   Users: ["Users"],
@@ -63,7 +61,7 @@ function Header(props) {
         component="div"
         position="static"
         elevation={0}
-        sx={{ zIndex: 0,bgcolor:"#171717" }}
+        sx={{ zIndex: 0, bgcolor: "#171717" }}
       >
         <Toolbar>
           <Grid container alignItems="center" spacing={1} marginTop={0.5}>
@@ -99,15 +97,7 @@ function Header(props) {
                 Go to docs
               </Link>
             </Grid>
-            <Grid item>
-              {" "}
-              {/* Alert */}
-              <Tooltip title="Alerts • No alerts">
-                <IconButton color="white">
-                  <NotificationsIcon />
-                </IconButton>
-              </Tooltip>
-            </Grid>
+
             <Grid item>
               <IconButton
                 color="inherit"
@@ -130,7 +120,7 @@ function Header(props) {
         component="div"
         position="static"
         elevation={0}
-        sx={{ zIndex: 0,bgcolor:"#171717" }}
+        sx={{ zIndex: 0, bgcolor: "#171717" }}
       >
         <Tabs value={tabIndex} textColor="inherit">
           {currentTabs.map((label, index) => (
@@ -138,7 +128,7 @@ function Header(props) {
               key={index}
               label={label}
               onClick={() => {
-                onTabChange(index)
+                onTabChange(index);
               }}
               sx={{
                 color: "#ffffff",
@@ -168,7 +158,6 @@ function Header(props) {
     </React.Fragment>
   );
 }
-
 
 Header.propTypes = {
   onDrawerToggle: PropTypes.func.isRequired,

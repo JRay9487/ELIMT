@@ -5,7 +5,6 @@ import {
   Box,
   AppBar,
   Toolbar,
-  TextField,
   Grid,
   Button,
   IconButton,
@@ -15,8 +14,9 @@ import {
   DialogContent,
   DialogActions,
   Typography,
+  DialogContentText,
 } from "@mui/material";
-import SearchIcon from "@mui/icons-material/Search";
+import ChecklistIcon from '@mui/icons-material/Checklist';
 import RefreshIcon from "@mui/icons-material/Refresh";
 import CheckableList from "./CheckableList";
 
@@ -58,7 +58,7 @@ export default function LBapprove({ tabIndex }) {
   };
 
   useEffect(() => {
-    const intervalId = setInterval(() => loadData(), 100); // Refresh every 5 seconds
+    const intervalId = setInterval(() => loadData(), 100); // 每100ms 刷新一次
     return () => clearInterval(intervalId); // Cleanup on unmount
   }, []);
 
@@ -93,101 +93,93 @@ export default function LBapprove({ tabIndex }) {
     <>
       {tabIndex === 0 && (
         <Paper sx={{ maxWidth: 936, margin: "auto", overflow: "hidden" }}>
-          <Box >
-          <AppBar
-            position="static"
-            color="transparent"
-            elevation={0}
-            sx={{ borderBottom: "1px solid rgba(0, 0, 0, 0.12)" }}
-          >
-            <Toolbar>
-              <Grid container spacing={2} alignItems="center">
-                <Grid item>
-                  <SearchIcon color='secondary' sx={{ display: "block" }} />
+          <Box>
+            <AppBar
+              position="static"
+              color="transparent"
+              elevation={0}
+              sx={{ borderBottom: "1px solid rgba(0, 0, 0, 0.12)" }}
+            >
+              <Toolbar>
+                <Grid container spacing={2} alignItems="center">
+                  <Grid item>
+                    <ChecklistIcon color="secondary" fontSize="large" sx={{ mt: 1}} />
+                  </Grid>
+                  <Grid item xs>
+                    <Typography variant="h5">簽核系統</Typography>
+                  </Grid>
+                  <Grid item>
+                    <Button
+                      variant="contained"
+                      onClick={handleApprove}
+                      sx={{ mr: 1 }}
+                    >
+                      Approve
+                    </Button>
+                    <Tooltip title="Refresh">
+                      <IconButton onClick={handleRefresh}>
+                        <RefreshIcon
+                          color="inherit"
+                          sx={{ display: "block" }}
+                        />
+                      </IconButton>
+                    </Tooltip>
+                  </Grid>
                 </Grid>
-                <Grid item xs>
-                  <TextField
-                    fullWidth
-                    placeholder=""
-                    InputProps={{
-                      disableUnderline: true,
-                      sx: { fontSize: "default" },
-                    }}
-                    variant="standard"
-                  />
-                </Grid>
-                <Grid item>
-                  <Button
-                    variant="contained"
-                    onClick={handleApprove}
-                    sx={{ mr: 1 }}
-                  >
-                    Approve
-                  </Button>
-                  <Tooltip title="Refresh">
-                    <IconButton onClick={handleRefresh}>
-                      <RefreshIcon color="inherit" sx={{ display: "block" }} />
-                    </IconButton>
-                  </Tooltip>
-                </Grid>
-              </Grid>
-            </Toolbar>
-          </AppBar>
-          <CheckableList
-            items={fileList}
-            checked={checked}
-            onToggle={handleToggle}
-          />
-          <Dialog
-            open={open}
-            onClose={handleClose}
-            sx={{
-              "& .MuiDialog-paper": { maxWidth: "none", width: "30%" },
-            }}
-          >
-            <DialogTitle>確認簽核</DialogTitle>
-            <DialogContent>
-              {checked.length > 0 ? (
-                checked.map((id) => {
-                  const item = fileList.find((item) => item.googleId === id);
-                  return (
-                    <div key={id}>{item ? item.filename : "未找到檔案"}</div>
-                  );
-                })
-              ) : (
-                <div>未選擇任何檔案</div>
-              )}
-            </DialogContent>
-            <DialogActions>
-              <Button
-                onClick={() => {
-                  handleClose();
-                }}
-              >
-                取消
-              </Button>
+              </Toolbar>
+            </AppBar>
+            <CheckableList
+              items={fileList}
+              checked={checked}
+              onToggle={handleToggle}
+            />
+            <Dialog open={open} onClose={handleClose}>
+              <DialogTitle>確認簽核</DialogTitle>
+              <DialogContent>
+                <DialogContentText>以下文件將被簽核通過：</DialogContentText>
+                <DialogContentText>
+                  {checked.length > 0 ? (
+                    checked.map((id) => {
+                      const item = fileList.find(
+                        (item) => item.googleId === id
+                      );
+                      return (
+                        <div key={id}>
+                          {item ? item.filename : "未找到檔案"}
+                        </div>
+                      );
+                    })
+                  ) : (
+                    <div>未選擇任何檔案</div>
+                  )}
+                </DialogContentText>
+              </DialogContent>
+              <DialogActions>
+                <Button
+                  onClick={() => {
+                    handleClose();
+                  }}
+                >
+                  取消
+                </Button>
 
-              <Button
-                onClick={() => {
-                  handleSubmit();
-                  setOpen(false);
-                }}
-              >
-                確認
-              </Button>
-            </DialogActions>
-          </Dialog>
+                <Button
+                  onClick={() => {
+                    handleSubmit();
+                    setOpen(false);
+                  }}
+                >
+                  確認
+                </Button>
+              </DialogActions>
+            </Dialog>
           </Box>
         </Paper>
       )}
 
       {tabIndex === 1 && (
-        <Paper
-          sx={{ maxWidth: 936, margin: "auto", overflow: "hidden" }}
-        >
-          <Typography>
-            History
-          </Typography>
+        <Paper sx={{ maxWidth: 936, margin: "auto", overflow: "hidden" }}>
+          <Typography>History</Typography>
         </Paper>
       )}
     </>

@@ -22,8 +22,7 @@ let theme = createTheme({
     },
     secondary: {
       main: "#FFFFFF",
-
-    }
+    },
   },
   typography: {
     h5: {
@@ -31,6 +30,12 @@ let theme = createTheme({
       fontSize: 26,
       letterSpacing: 0.5,
     },
+    h6: {
+      fontWeight: 480,
+      fontSize: 20,
+      letterSpacing: 0.4,
+      color: "#fff",
+    }
   },
   shape: {
     borderRadius: 8,
@@ -53,20 +58,6 @@ let theme = createTheme({
 theme = {
   ...theme,
   components: {
-    MuiTextField: {
-      styleOverrides: {
-        root: {
-          "& .MuiOutlinedInput-root": {
-            "& fieldset": {
-              borderColor: "#2e2e2e",
-            },
-            "&:hover fieldset": {
-              borderColor: "#46C5FF",
-            },
-          },
-        },
-      },
-    },
     MuiDrawer: {
       styleOverrides: {
         backgroundColor: "#161616",
@@ -200,8 +191,8 @@ theme = {
       styleOverrides: {
         root: {
           color: "#ffffff",
-        }
-      }
+        },
+      },
     },
     MuiCheckbox: {
       styleOverrides: {
@@ -212,10 +203,24 @@ theme = {
             "& .MuiSvgIcon-root": {
               color: "#ffffff",
               fill: "#ffffff",
-            }
-          }
-        }
-      }
+            },
+          },
+        },
+      },
+    },
+    MuiDialogContent: {
+      styleOverrides: {
+        root: {
+          color: "#ffffff",
+        },
+      },
+    },
+    MuiDialogContentText: {
+      styleOverrides: {
+        root: {
+          color: "#ffffff",
+        },
+      },
     },
   },
 };

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import PdfViewer from "./pdfviewer/Pdfviewer";
 
@@ -18,18 +18,21 @@ import {
 import UploadFileIcon from "@mui/icons-material/UploadFile";
 import Filelist from "./Uploadhistory";
 
-
 function Labbook({ userInfo, tabIndex }) {
   const fullname = userInfo ? userInfo.fullname : "Unknown";
+  const username = userInfo ? userInfo.username : "Unknown";
   const [experimentDetail, setExperimentDetail] = useState("");
   const [uploadFile, setUploadFile] = useState(null);
+  const [uploadHistory, setUploadHistory] = useState([]);
   const [openPop, setOpenPop] = useState(false);
   const [uploadname, setUploadname] = useState("");
 
+  // 上傳檔案選擇
   const handleFileSelect = (file) => {
     setUploadFile(file);
   };
 
+  // 上傳檔案名稱預處理
   const handleSubmit = (event) => {
     event.preventDefault();
     const today = new Date();
@@ -41,7 +44,7 @@ function Labbook({ userInfo, tabIndex }) {
     setOpenPop(true);
   };
 
-  // 彈出視窗確認
+  // 確認視窗
   const handleConfirm = () => {
     if (!uploadFile || !uploadname) {
       alert("File or upload name is missing!");
@@ -66,64 +69,101 @@ function Labbook({ userInfo, tabIndex }) {
         console.error("Upload error:", error);
         alert("Failed to upload file.");
       });
-    setOpenPop(false); // 上傳後關閉彈出視窗
+    setOpenPop(false);
+    setUploadname("");
   };
   const handleClose = () => {
-    setOpenPop(false); // 用戶取消時關閉彈出視窗
+    setOpenPop(false);
   };
+
+  // 獲取已簽核資料
+  const loadData = async () => {
+    try {
+      const response = await axios.get(`/api/files/?creater=${username}`);
+      setUploadHistory(response.data.files);
+    } catch (error) {
+      console.error("Error fetching files:", error);
+    }
+  };
+
+  useEffect(() => {
+    const intervalId = setInterval(() => loadData(), 1000); // 每1000ms 刷新一次
+    return () => clearInterval(intervalId); // Cleanup on unmount
+  }, []);
 
   return (
     <>
       {tabIndex === 0 && (
         <Box component="form" onSubmit={handleSubmit} className="labbook">
-          <Box sx={{ mx: 6, mt: 4 }}>
-            <Grid
-              container
-              sx={{ justifyContent: "space-between", alignItems: "center" }}
-            >
-              <Grid item >
-                <Typography
-                  variant="h5"
-                  component="div"
-                  sx={{ fontWeight: "bold", margin: 0, display: "flex" }}
+          <Grid sx={{ mx: 4, my: 2 }}>
+            <Grid container alignItems={"center"}>
+              <Grid item xs={12}>
+                <Grid
+                  container
+                  sx={{ justifyContent: "space-between", alignItems: "center" }}
                 >
-                  <UploadFileIcon fontSize="large" sx={{ mr: 1 }} />{" "}
-                  實驗記錄上傳
-                </Typography>
+                  <Grid item>
+                    <Typography
+                      variant="h5"
+                      sx={{ fontWeight: "bold", margin: 0, display: "flex" }}
+                    >
+                      <UploadFileIcon fontSize="large" sx={{ mr: 1 }} />{" "}
+                      實驗記錄上傳
+                    </Typography>
+                  </Grid>
+                  <Grid item>
+                    <Button variant="contained">下載範本</Button>
+                  </Grid>
+                </Grid>
               </Grid>
-              <Grid item>
-                <Button variant="contained">
-                  下載範本
+
+              <Grid item xs={12}>
+                <TextField
+                  variant="outlined"
+                  label="實驗簡述"
+                  value={experimentDetail}
+                  onChange={(e) => setExperimentDetail(e.target.value)}
+                  InputProps={{
+                    style: { color: "#C0C0C0" },
+                  }}
+                  InputLabelProps={{
+                    style: { color: "#C0C0C0" },
+                  }}
+                  fullWidth
+                  sx={{
+                    mt: 2,
+                    "& .MuiOutlinedInput-root": {
+                      "& fieldset": {
+                        borderColor: "#2e2e2e",
+                      },
+                      "&:hover fieldset": {
+                        borderColor: "secondary.main", 
+                      },
+                      "&.Mui-focused fieldset": {
+                        borderColor: "primary.main", 
+                      },
+                    },
+                  }}
+                />
+              </Grid>
+
+              <Grid item xs={12} sx={{ mb: 6, mt: 3 }}>
+                <PdfViewer onFileSelect={handleFileSelect} />
+              </Grid>
+
+              <Grid item xs={12} container justifyContent={"center"}>
+                <Button
+                  className="submit-btn"
+                  type="submit"
+                  variant="contained"
+                  color="primary"
+                  sx={{ my: 2 }}
+                >
+                  提交
                 </Button>
               </Grid>
             </Grid>
-            <TextField
-            variant="outlined"
-              label="實驗簡述"
-              value={experimentDetail}
-              onChange={(e) => setExperimentDetail(e.target.value)}
-              InputLabelProps={{
-                style: { color: '#C0C0C0' },
-              }}
-              fullWidth
-              sx={{ mt: 2 , borderColor:"primary"}}
-              
-            />
-
-            <Grid sx={{ mb: 6, mt: 3 }}>
-              <PdfViewer onFileSelect={handleFileSelect} />
-            </Grid>
-          </Box>
-
-          <Button
-            className="submit-btn"
-            type="submit"
-            variant="contained"
-            color="primary"
-            sx={{ my: 2 }}
-          >
-            提交
-          </Button>
+          </Grid>
 
           <Dialog open={openPop} onClose={handleClose}>
             <DialogTitle>{"確認提交"}</DialogTitle>
@@ -147,9 +187,8 @@ function Labbook({ userInfo, tabIndex }) {
         </Box>
       )}
       {tabIndex === 1 && (
-        <Box>
-          <Typography>History</Typography>
-          <Filelist />
+        <Box sx={{ mx: 4, my: 2 }}>
+          <Filelist items={uploadHistory} />
         </Box>
       )}
     </>

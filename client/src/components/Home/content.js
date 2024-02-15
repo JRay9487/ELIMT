@@ -10,43 +10,43 @@ import Users from "./content/Users";
 import Settings from "./content/Settings";
 
 export default function Content(props) {
-    const { activeItem, tabIndex } = props;
+  const { activeItem, tabIndex } = props;
 
-    //get userInfo from local storage
-    const [userInfo, setUserInfo] = useState({});
+  //get userInfo from local storage
+  const [userInfo, setUserInfo] = useState({});
 
-    useEffect(() => {
-        const userInfoString = localStorage.getItem("user");
-        if (userInfoString) {
-            const userInfo = JSON.parse(userInfoString);
-            setUserInfo(userInfo);
-        }
-    }, []);
+  useEffect(() => {
+    const userInfoString = localStorage.getItem("user");
+    if (userInfoString) {
+      const userInfo = JSON.parse(userInfoString);
+      setUserInfo(userInfo);
+    }
+  }, []);
 
-    // tabindex
+  // tabindex
 
-    const renderContentComponent = () => {
-        switch (activeItem) {
-            case "Profile":
-                return <Profile userInfo={userInfo} tabIndex={tabIndex} />;
-            case "Lab Book":
-                return <Labbook userInfo={userInfo} tabIndex={tabIndex} />;
-            case "Lab Book Approval":
-                return <LBapprove tabIndex={tabIndex}/>;
-            case "Links":
-                return <Links tabIndex={tabIndex}/>;
-            case "Settings":
-                return <Settings tabIndex={tabIndex}/>;
-            case "Users":
-                return <Users tabIndex={tabIndex}/>;
-            default:
-                return <Profile userInfo={userInfo} tabIndex={tabIndex}/>;
-        }
-    };
+  const renderContentComponent = () => {
+    switch (activeItem) {
+      case "Profile":
+        return <Profile userInfo={userInfo} tabIndex={tabIndex} />;
+      case "LabBook":
+        return <Labbook userInfo={userInfo} tabIndex={tabIndex} />;
+      case "LabBook Approval":
+        return <LBapprove tabIndex={tabIndex} />;
+      case "Links":
+        return <Links tabIndex={tabIndex} />;
+      case "Settings":
+        return <Settings tabIndex={tabIndex} />;
+      case "Users":
+        return <Users tabIndex={tabIndex} />;
+      default:
+        return <Profile userInfo={userInfo} tabIndex={tabIndex} />;
+    }
+  };
 
-    return (
-        <Paper sx={{ maxWidth: 936, margin: "auto", overflow: "hidden",}}>
-            {renderContentComponent()}
-        </Paper>
-    );
+  return (
+    <Paper sx={{ maxWidth: 936, margin: "auto", overflow: "hidden" }}>
+      {renderContentComponent()}
+    </Paper>
+  );
 }

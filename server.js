@@ -4,7 +4,7 @@ const bodyParser = require("body-parser");
 const multer = require("multer");
 const session = require("express-session");
 const fs = require("fs");
-const nodemailer = require('nodemailer');
+const nodemailer = require("nodemailer");
 const uploadsFolder = "./uploads/";
 const settings = require("./settings.json");
 
@@ -18,9 +18,8 @@ const { checkedFile } = require("./functions/checked");
 const app = express();
 const db = new sqlite3.Database("mydb.sqlite"); //database connect
 const upload = multer({ dest: "uploads/" }); // 暫存檔位置
-const port = 3001; 
-const mailerinterval = settings.SystemMailInterval * 3600000 ; 
-
+const port = 3001;
+const mailerinterval = settings.SystemMailInterval * 3600000;
 
 // 解析POST請求
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -81,6 +80,47 @@ app.get("/checkAuth", (req, res) => {
   }
 });
 
+// 帳號修改
+app.post("/api/account", (req, res) => {
+  const { username, fullname, email, password } = req.body;
+  let sql = "UPDATE users SET";
+  let params = [];
+  let toUpdate = []; // 用於保存需要更新的字段
+
+  if (fullname && fullname.trim() !== '') {
+    toUpdate.push(" fullname = ?");
+    params.push(fullname);
+  }
+
+  if (email && email.trim() !== '') {
+    toUpdate.push(" email = ?");
+    params.push(email);
+  }
+
+  if (password && password.trim() !== '') {
+    toUpdate.push(" password = ?");
+    params.push(password);
+  }
+
+  if (toUpdate.length === 0) {
+    res.json({ warning: "No update performed due to empty fields." });
+    return;
+  }
+
+  sql += toUpdate.join(",");
+  sql += " WHERE username = ?";
+  params.push(username);
+
+  db.run(sql, params, (err) => {
+    if (err) {
+      console.error(err.message);
+      res.status(500).json({ error: "Internal server error" });
+      return;
+    }
+    res.json({ success: true, message: "Account updated successfully" });
+  });
+});
+
 // Oauth
 app.get("/api/oauth", (req, res) => {
   authorize()
@@ -95,50 +135,46 @@ app.get("/api/oauth", (req, res) => {
 
 // 檔案上傳雲端
 app.post("/api/upload", upload.single("file"), (req, res) => {
-    if (!req.file) {
-        return res.status(400).send("No file uploaded.");
-    }
+  if (!req.file) {
+    return res.status(400).send("No file uploaded.");
+  }
 
-    const folderId = settings.GDrive_folderID;
-    const fileName = req.body.uploadname;
-    const filePath = req.file.path;
+  const folderId = settings.GDrive_folderID;
+  const fileName = req.body.uploadname;
+  const filePath = req.file.path;
 
-    authorize()
-        .then((auth) => {
-            uploadFile(auth, folderId, fileName, filePath)
-                .then((fileId) => {
-                    // 在這裡調用 listFiles 函數以更新資料庫
-                    listFiles(auth, folderId)
-                        .then(() => {
-                            res.send({
-                                success: true,
-                                fileId: fileId,
-                                message:
-                                    "File uploaded and database updated successfully.",
-                            });
-                        })
-                        .catch((error) => {
-                            console.error("Failed to update database:", error);
-                            // 即使更新資料庫失敗，也返回上傳成功的訊息
-                            res.send({
-                                success: true,
-                                fileId: fileId,
-                                message:
-                                    "File uploaded but failed to update database.",
-                            });
-                        });
-                })
-                .catch((error) => {
-                    console.error(error);
-                    res.status(500).send(
-                        "Failed to upload file to Google Drive."
-                    );
-                });
+  authorize()
+    .then((auth) => {
+      uploadFile(auth, folderId, fileName, filePath)
+        .then((fileId) => {
+          // 在這裡調用 listFiles 函數以更新資料庫
+          listFiles(auth, folderId)
+            .then(() => {
+              res.send({
+                success: true,
+                fileId: fileId,
+                message: "File uploaded and database updated successfully.",
+              });
+            })
+            .catch((error) => {
+              console.error("Failed to update database:", error);
+              // 即使更新資料庫失敗，也返回上傳成功的訊息
+              res.send({
+                success: true,
+                fileId: fileId,
+                message: "File uploaded but failed to update database.",
+              });
+            });
         })
         .catch((error) => {
-            console.error("Authorization failed:", error);
-            res.status(500).send("Failed to authorize.");
+          console.error(error);
+          res.status(500).send("Failed to upload file to Google Drive.");
         });
+    })
+    .catch((error) => {
+      console.error("Authorization failed:", error);
+      res.status(500).send("Failed to authorize.");
+    });
 });
 
 // 獲得雲端檔案列表
@@ -162,7 +198,8 @@ app.get("/api/files", (req, res) => {
   const { creater, check } = req.query;
 
   // 構建 SQL 查詢的基本部分
-  let query = 'SELECT "googleId", "filename", "creater", "date" FROM files';
+  let query =
+    'SELECT "googleId", "filename", "creater", "date", "check" FROM files';
   const params = [];
 
   // 構建 SQL 查詢的條件部分
@@ -239,8 +276,7 @@ app.get("/api/refresh", (req, res) => {
   authorize().then((auth) => {
     listFiles(auth, folderId)
       .then(() => {
-        const query =
-          'SELECT "googleId"  FROM files WHERE "check" = "false"';
+        const query = 'SELECT "googleId"  FROM files WHERE "check" = "false"';
         db.all(query, [], (err, rows) => {
           if (err) {
             console.error("Error when fetching file from database:", err);
@@ -266,58 +302,66 @@ app.get("/api/refresh", (req, res) => {
   });
 });
 
+// 自動雲端檔案刷新
+setInterval(() => {
+  const folderId = settings.GDrive_folderID;
+  authorize().then((auth) => {
+    listFiles(auth, folderId)
+      .then((files) => console.log("Files listed"))
+      .catch((error) => console.error("Failed to list files", error));
+  });
+}, 300000);
+
 // 郵件提醒
 function sendMail(callback) {
-    var transporter = nodemailer.createTransport({
-      service: 'gmail',
-      auth: {
-        user: settings.SystemMailer,
-        pass: settings.SystemMailerPass
-      }
-    });
-    
-    const query = 'SELECT "email" FROM users WHERE "privilege" > 2';
-    db.all(query, [], (err, rows) => {
-      if (err) {
-        throw err;
-      }
-  
-      const receivers = rows.map(row => row.email).join(', ');
-  
-      if (receivers) {
-        var mailOptions = {
-          from: settings.SystemMailer,
-          to: receivers, // 使用轉換後的接收者字串
-          subject: 'ELIMT System Information',
-          html: "<h3>您有一份待簽核文件，請撥空查閱ELIMT電子系統。</h3><h3>You have a document to be signed, please check the ELIMT system.</h3>"
-        };
-  
-        transporter.sendMail(mailOptions, callback);
-      } else {
-        console.log("No users with privilege > 1 found.");
-      }
-    });
-  }
-  
-  // 週期性更新
-  setInterval(() => {
-    const query = 'SELECT "googleId" FROM files WHERE "check" = "false"';
-    db.all(query, [], (err, rows) => {
-      if (err) {
-        throw err;
-      }
-      if (rows.length > 0) {
-        // 如果有一或多個文件未檢查，則發送郵件
-        sendMail((error, info) => {
-          if (error) {
-            console.log('Error sending mail: ', error);
-          } else {
-            console.log('Mail sent: ', info.response);
-          }
-        });
-      }
-    });
-  }, mailerinterval);
+  var transporter = nodemailer.createTransport({
+    service: "gmail",
+    auth: {
+      user: settings.SystemMailer,
+      pass: settings.SystemMailerPass,
+    },
+  });
+
+  const query = 'SELECT "email" FROM users WHERE "privilege" > 1';
+  db.all(query, [], (err, rows) => {
+    if (err) {
+      throw err;
+    }
+
+    const receivers = rows.map((row) => row.email).join(", ");
+
+    if (receivers) {
+      var mailOptions = {
+        from: settings.SystemMailer,
+        to: receivers, // 使用轉換後的接收者字串
+        subject: "ELIMT System Information",
+        html: "<h3>您有一份待簽核文件，請撥空查閱ELIMT電子系統。</h3><h3>You have a document to be signed, please check the ELIMT system.</h3>",
+      };
+
+      transporter.sendMail(mailOptions, callback);
+    } else {
+      console.log("No users with privilege > 1 found.");
+    }
+  });
+}
+setInterval(() => {
+  const query = 'SELECT "googleId" FROM files WHERE "check" = "false"';
+  db.all(query, [], (err, rows) => {
+    if (err) {
+      throw err;
+    }
+    if (rows.length > 0) {
+      // 如果有一或多個文件未檢查，則發送郵件
+      sendMail((error, info) => {
+        if (error) {
+          console.log("Error sending mail: ", error);
+        } else {
+          console.log("Mail sent: ", info.response);
+        }
+      });
+    }
+  });
+}, mailerinterval);
 
 // 暫存檔案清除器
 setInterval(() => {
@@ -347,7 +391,7 @@ setInterval(() => {
       });
     }
   });
-}, 600000); //10 mins
+}, 6000000);
 
 // 啟動服務器
 app.listen(port, () => {
