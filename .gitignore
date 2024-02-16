@@ -1,4 +1,9 @@
 node_modules
 .DS_Store
-/auth
 .env
+client
+functions
+mydb.sqlite
+server.js
+setting.json
+uploads
