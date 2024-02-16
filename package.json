@@ -14,7 +14,7 @@
         "app": "concurrently \"npm run server\" \"npm run client\""
     },
     "author": "CHUN-JUI,LIN",
-    "license": "MIT License",
+    "license": "DO NOT ",
     "dependencies": {
         "@google-cloud/local-auth": "^2.1.0",
         "bcrypt": "^5.1.1",
