@@ -7,5 +7,6 @@ client/
 functions/
 uploads/
 /mydb.sqlite
-
+/settings.json
+/server.js
 
