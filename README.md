@@ -84,7 +84,7 @@
   2. 如果安裝Node.js 在輸入 ```Node -v```，應會出現版本資訊 
   3. 下載本項目資料至電腦
   4. 使用CLI 進入項目資料夾，並輸入 ```npm run install-app```，下載所有專案需求模組
-  5. 使用 ```npm run app```，啟動系統
+  5. 使用 ```node server.js```，啟動系統
   6. 預設登入帳號為admin 密碼為lab12345，可透過此管理帳號新增其他用戶(開發中)，或使用[DB Browser for SQLite](https://sqlitebrowser.org/)，編輯資料庫中的`users` 資料表。
   7. 第一次登入必須先授權Google Drive API，切換網頁至```localhost:3000/oauth```。
 
