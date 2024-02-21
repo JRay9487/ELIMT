@@ -10,24 +10,6 @@
 
 ## 架構 
   由Express結合ReactJS 形成簡易免安裝網頁應用程式，透過SQLite儲存基本用戶、檔案資訊，並透過Google Cloud API 串連雲端硬碟，將檔案儲存在雲端中，減低儲存相關設備開銷。前端頁面使用MUI(Material UI) 減低開發難度，並可自行更成喜歡的顯示風格。
-
-  透過API串接前後端介面，減低用戶端負擔，以下是程式使用的API接口：
-  *  系統操作類
-      *  /login : 處理登入請求
-      *  /logout : 處理登出請求
-      *  /checkAuth : 確認使用者是否含有登入憑證
-     <div><br/></div>
-  *  帳號系統
-      *  /api/account/?modify= (insert & delete ) : 修改帳號資料
-      *  /api/account/list : 獲取當前帳號列表
-      <div><br/></div>
-  *  檔案系統
-      *  /api/files/?username= {username} : 以{username}為查詢方法獲取資料庫中的檔案資料
-      *  /api/files/?check= ( true/flase ) : 以是否簽核為查詢方法獲取資料庫中的檔案資料
-      *  /oauth : 獲取Google API授權
-      *  /api/upload : 上傳檔案至Google雲端
-      *  /api/list : 獲取雲端資料夾中的檔案名稱
-      *  /api/checked : 重新命名使檔案獲得"checked-"前綴  
   
   ![project](https://github.com/JRay9487/Electrical-laboratory-Notebook/assets/65828051/987ebe11-90a0-4d03-b816-3cd93b66f3bd)
 
@@ -60,6 +42,7 @@
 ## 版本更新
 *   2024/02/16 Beta 1.0，基本功能已完成。
 *   2024/02/18 Release 1.0.0 完善搜尋功能、登出處理、https授權。
+*   2024/02/21 Release 1.0.1 修復在輸出靜態網頁後，無法正常調用pdf.js worker 的問題。
 
 <div>
   <br>
