@@ -53,14 +53,25 @@
   ### Bugs
   * Under macOS Sonoma 14.2.1, Safari 17.2.1 (19617.1.17.11.12), ``@google-cloud/local-auth`` may not be able to authenticate locally, Chrome is recommended.
 
+  ### Requirement.
+  1. Node.js >v18.16.0
+  2. Google account for system.
+  3. Internet connection.
+
 
   ### Install
   1. Download [node.js v18.16.0](https://nodejs.org/en)
   2. If you have successfully installed Node.js, type ``node -v`` and the version information should appear.  
-  3. Clone the project data to your computer
-  4. Use the CLI to access the project folder and type ``npm install`` to download the project requirements module.
-  5. Use ``node index.js`` to start the system.
-  6. Default login account is admin, password is lab12345, you can use this account to add other users, or use [DB Browser for SQLite](https://sqlitebrowser.org/) to edit the `users` table in the database.
-  7. You must authorize the Google Drive API for the first login, by switch to ``localhost:3000/oauth``.
+  3. Clone the project to your device.
+  4. Use the System Google account to create a folder inside Google Drive and copy the folder ID into `settings.json`.
+  5. Create an app login password for your system google account.
+  6. Fill your system Google account info and a random password for the session to the `.env` file.
+  7. Go to [Google Cloud Console](https://console.cloud.google.com) and enable API service.
+  8. Setup your API credentials which have `https://www.googleapis.com/auth/drive` scope and redirect URL `http://localhost:3000/oauth2callback`.
+  9. Place your `credentilas.json` inside `./functions/auth`.
+  10. Use the CLI to access the project folder and type ``npm install`` to download the project requirements module.
+  11. Use ``node index.js`` to start the local system.
+  12. The default login account is admin, and the password is lab12345, you can use this account to add other users, or use [DB Browser for SQLite](https://sqlitebrowser.org/) to edit the `users` table in the database.
+  13. You must authorize the Google Drive API for the first login, by switching to ``localhost:3000/oauth``.
 
 
