@@ -1,12 +1,4 @@
 node_modules
 .DS_Store
-.env
-.json
-.js
-client/
-functions/
 uploads/
-/mydb.sqlite
-/settings.json
-/server.js
 
