@@ -2,3 +2,5 @@ node_modules
 .DS_Store
 uploads/
 
+functions/auth/credentials.json
+functions/auth/token.json
